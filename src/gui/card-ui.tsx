@@ -380,9 +380,11 @@ export class CardUI {
         this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
         setIcon(this.currentDeckCardCounterIcon, "credit-card");
 
-        if (this.settings.showContextInCards) {
-            this.cardContext = this.infoSection.createDiv();
-            this.cardContext.addClass("sr-context");
+        // Always create the card context element to avoid undefined errors
+        this.cardContext = this.infoSection.createDiv();
+        this.cardContext.addClass("sr-context");
+        if (!this.settings.showContextInCards) {
+            this.cardContext.addClass("sr-is-hidden");
         }
     }
 
@@ -440,9 +442,20 @@ export class CardUI {
     }
 
     private _updateCardContext() {
+        if (!this.cardContext) {
+            return;
+        }
+
         if (!this.settings.showContextInCards) {
             this.cardContext.setText("");
+            if (!this.cardContext.hasClass("sr-is-hidden")) {
+                this.cardContext.addClass("sr-is-hidden");
+            }
             return;
+        }
+
+        if (this.cardContext.hasClass("sr-is-hidden")) {
+            this.cardContext.removeClass("sr-is-hidden");
         }
         this.cardContext.setText(
             ` ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
